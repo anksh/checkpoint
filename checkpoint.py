@@ -1,22 +1,20 @@
 #!/usr/local/bin/python3
 
-import os, sys
+import os, getopt, sys
 
 
 def _get_current_directory():
     return os.getcwd()
 
 def add_checkpoint():
-    # option 1: read file
-    # find next unused entry
-    # write to back of file
-    # option 2: keep a global count
     # update count and write to back of file
+    # return number of checkpoint and the directory that was added
     pass
 
 def go_to_checkpoint(target):
     # find the checkpoint
     # cd to that checkpoint
+    # return the checkpoint that we just went to
     pass
 
 def delete_checkpoint(victim):
@@ -40,14 +38,49 @@ def main():
     # if args are valid, return the chosen function
     # else throw/return None
 
-    # different options:
-    #     n: adds a new checkpoint
-    #     <int>: goes to that directory (if it exists)
-    #     d <int>: deletes a specific checkpoint - should prompt the user before doing so
-    #     e: erases all checkpoints - should prompt the user before doing so
-    #     l: list all checkpoints
-    pass
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "nc:r:elh")
+    except getopt.GetoptError as e:
+        print(str(e))
+        sys.exit(1)
 
+    if args:
+        print("The argument, " + str(args[0]) + ", that you passed in was ignored, possibly along with other bad arguments.")
+        print("Please pass in the -h flag for more info on how to use this script.", end="\n\n")
+
+    for o, a in opts:
+        print("Option: " + o)
+        print("Argument: " + str(a)) if a else None
+
+        # different options:
+        if(o == "-n"):
+            print("Added a new checkpoint number _______ at __________")
+            # n: adds a new checkpoint
+            pass
+        elif(o == "-c"):
+            print("Switched to checkpoint number _____ ")
+            # c <int>: goes to that directory (if it exists)
+            pass
+        elif(o == "-r"):
+            print("Removed checkpoint number ___ at _________ ")
+            # r <int>: removes a specific checkpoint - should prompt the user before doing so
+            pass
+        elif(o == "-e"):
+            print("Cleared all checkpoints")
+            # e: erases all checkpoints - should prompt the user before doing so
+            pass
+        elif(o == "-l"):
+            print("LIST OF CKPTS")
+            # l: list all checkpoints
+            pass
+        elif(o == "-h"):
+            print("Help coming soon")
+            # h: help
+            pass
+        else:
+            print("Yeah something fucked up, this is not a valid option")
+            # shouldnt get here but just in case a helpful error message
+            pass
 
 if __name__ == '__main__':
     main()
