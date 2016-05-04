@@ -8,28 +8,28 @@ def _get_current_directory():
 def add_checkpoint():
     # update count and write to back of file
     # return number of checkpoint and the directory that was added
-    pass
+    print "Added a new checkpoint number _______ at __________"
 
 def go_to_checkpoint(target):
     # find the checkpoint
     # cd to that checkpoint
     # return the checkpoint that we just went to
-    pass
+    print "Switched to checkpoint number _____ "
 
 def delete_checkpoint(victim):
     # read file
     # find checkpoint
     # remove it
     # rewrite file
-    pass
+    print "Removed checkpoint number ___ at _________ "
 
 def erase_all_checkpoints():
     # as simple as clearing the file
-    pass
+    print "Cleared all checkpoints"
 
 def list_checkpoints():
     # print out all checkpoints in a readable manner
-    pass
+    print "LIST OF CKPTS"
 
 
 def main():
@@ -54,33 +54,32 @@ def main():
 
         # different options:
         if o == "-n":
-            print "Added a new checkpoint number _______ at __________"
             # n: adds a new checkpoint
-            pass
+            add_checkpoint()
+
         elif o == "-c":
-            print "Switched to checkpoint number _____ "
             # c <int>: goes to that directory (if it exists)
-            pass
+            go_to_checkpoint(a)
+
         elif o == "-r":
-            print "Removed checkpoint number ___ at _________ "
             # r <int>: removes a specific checkpoint - should prompt the user before doing so
-            pass
+            delete_checkpoint(a)
+
         elif o == "-e":
-            print "Cleared all checkpoints"
             # e: erases all checkpoints - should prompt the user before doing so
-            pass
+            erase_all_checkpoints()
+
         elif o == "-l":
-            print "LIST OF CKPTS"
             # l: list all checkpoints
-            pass
+            list_checkpoints()
+
         elif o == "-h":
-            print "Help coming soon"
             # h: help
-            pass
+            print "Help coming soon"
+
         else:
-            print "Yeah something fucked up, this is not a valid option"
             # shouldnt get here but just in case a helpful error message
-            pass
+            print "Yeah something fucked up, this is not a valid option"
 
 if __name__ == '__main__':
     main()
