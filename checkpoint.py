@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 import os, getopt, sys
+from StringIO import StringIO
+
+DATAFILE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/.checkpoints.txt"
 
 def _get_current_directory():
     return os.getcwd()
@@ -8,7 +11,24 @@ def _get_current_directory():
 def add_checkpoint():
     # update count and write to back of file
     # return number of checkpoint and the directory that was added
-    print "Added a new checkpoint number _______ at __________"
+    cwd = _get_current_directory()
+    data_file = open(DATAFILE_PATH, 'r')
+    data_buf = StringIO(data_file.read())
+    data_file.close()
+    num_entries = int(data_buf.readline())
+    new_entries = num_entries + 1
+    new_entries = str(new_entries)
+    data_buf.seek(0)
+    data_buf.write(new_entries.zfill(10) + '\n')
+    to_write = str(new_entries)+ ' ' + cwd + '\n'
+    data_buf.seek(0, os.SEEK_END)
+    data_buf.write(to_write)
+    data_file = open(DATAFILE_PATH, 'w')
+    data_file.write(data_buf.getvalue())
+    data_file.close()
+    data_buf.close()
+
+    print "Added a new checkpoint number " + str(new_entries) + " at " + cwd
 
 def go_to_checkpoint(target):
     # find the checkpoint
@@ -45,7 +65,11 @@ def main():
 
     if args:
         print "The argument, " + str(args[0]) + ", that you passed in was ignored, possibly along with other bad arguments."
-        print "Please pass in the -h flag for more info on how to use this script."
+        print "Please pass in the -h flag for more info on how to use this script.\n"
+
+    if not opts:
+        print "No options were passed in."
+        print "Please pass in the -h flag for more info on how to use this script.\n"
 
     for o, a in opts:
         print "Option: " + o
