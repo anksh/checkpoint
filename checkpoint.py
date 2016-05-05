@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, getopt, sys
+import os, getopt, subprocess, sys
 from StringIO import StringIO
 
 DATAFILE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/.checkpoints.txt"
@@ -9,20 +9,23 @@ def _get_current_directory():
     return os.getcwd()
 
 def add_checkpoint():
-    # update count and write to back of file
+    # update count and write new checkpoint to back of file
     # return number of checkpoint and the directory that was added
     cwd = _get_current_directory()
     data_file = open(DATAFILE_PATH, 'r')
     data_buf = StringIO(data_file.read())
     data_file.close()
+
     num_entries = int(data_buf.readline())
     new_entries = num_entries + 1
     new_entries = str(new_entries)
     data_buf.seek(0)
     data_buf.write(new_entries.zfill(10) + '\n')
+
     to_write = str(new_entries)+ ' ' + cwd + '\n'
     data_buf.seek(0, os.SEEK_END)
     data_buf.write(to_write)
+
     data_file = open(DATAFILE_PATH, 'w')
     data_file.write(data_buf.getvalue())
     data_file.close()
@@ -33,8 +36,26 @@ def add_checkpoint():
 def go_to_checkpoint(target):
     # find the checkpoint
     # cd to that checkpoint
-    # return the checkpoint that we just went to
-    print "Switched to checkpoint number _____ "
+
+    target = int(target)
+
+    data_file = open(DATAFILE_PATH, 'r')
+    num_entries = int(data_file.readline())
+    if target > num_entries:
+        print "Invalid checkpoint number, try listing all the checkpoints as a double check!"
+        return
+
+    for x in xrange(1, target):
+        data_file.readline()
+
+    target_line = data_file.readline()
+    target_dir = target_line.split(' ', 1)[1]
+    target_dir = target_dir[:-1] # removing newline character
+    subprocess.call(['cd', target_dir])
+
+    data_file.close()
+    print target_dir
+    # print "Switched to checkpoint number " + str(target) + " at " + target_dir
 
 def delete_checkpoint(victim):
     # read file
@@ -72,9 +93,10 @@ def main():
         print "Please pass in the -h flag for more info on how to use this script.\n"
 
     for o, a in opts:
-        print "Option: " + o
+        # print "Option: " + o
         if a:
-            print "Argument: " + str(a)
+            pass
+            # print "Argument: " + str(a)
 
         # different options:
         if o == "-n":
