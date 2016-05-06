@@ -1,9 +1,1 @@
-0000000008
-1 /Users/ankitshah/Personal/Code/checkpoint
-2 /Users/ankitshah/Personal/Code
-3 /Users/ankitshah/Personal/Code/checkpoint
-4 /Users/ankitshah/Personal/Code/checkpoint
-5 /Users/ankitshah/Personal/Code/checkpoint
-6 /Users/ankitshah/Personal/Code/checkpoint
-7 /Users/ankitshah/Personal/Code
-8 /Users/ankitshah/Personal/Code
+0

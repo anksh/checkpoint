@@ -93,16 +93,34 @@ def delete_checkpoint(victim):
     data_file = open(DATAFILE_PATH, 'w')
     data_file.write(file_buf.getvalue())
     data_file.close()
+    file_buf.close()
 
     print "Removed checkpoint number " +  str(victim)  + " at " + victim_dir[:-1]
 
 def erase_all_checkpoints():
     # as simple as clearing the file
+
+    data_file = open(DATAFILE_PATH, 'w')
+    data_file.write('0')
+    data_file.close()
+
     print "Cleared all checkpoints"
 
 def list_checkpoints():
     # print out all checkpoints in a readable manner
-    print "LIST OF CKPTS"
+
+    data_file = open(DATAFILE_PATH, 'r')
+
+    num_entries = int(data_file.readline())
+
+    print "Listing " + str(num_entries) + " checkpoints..."
+
+    for line in data_file.readlines():
+        split_line = line.split(' ', 1)
+        print "Checkpoint #" + split_line[0] + ":\t" + split_line[1] ,
+
+    data_file.close()
+
 
 
 def main():
