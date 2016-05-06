@@ -62,7 +62,39 @@ def delete_checkpoint(victim):
     # find checkpoint
     # remove it
     # rewrite file
-    print "Removed checkpoint number ___ at _________ "
+
+    victim = int(victim)
+
+    data_file = open(DATAFILE_PATH, 'r')
+    num_entries = int(data_file.readline())
+    new_entries = str(num_entries - 1)
+
+    if victim > num_entries:
+        print "Invalid checkpoint number, try listing all the checkpoints as a double check!"
+        return
+
+    file_buf = StringIO()
+    file_buf.write(new_entries.zfill(10) + '\n')
+
+    victim_dir = None
+    for line in data_file.readlines():
+        split_line = line.split(' ', 1)
+        index = int(split_line[0])
+        if victim_dir:
+            index -= 1
+            file_buf.write(str(index) + ' ' + split_line[1])
+        else:
+            if index == victim:
+                victim_dir = split_line[1]
+            else:
+                file_buf.write(line)
+
+    data_file.close()
+    data_file = open(DATAFILE_PATH, 'w')
+    data_file.write(file_buf.getvalue())
+    data_file.close()
+
+    print "Removed checkpoint number " +  str(victim)  + " at " + victim_dir[:-1]
 
 def erase_all_checkpoints():
     # as simple as clearing the file
