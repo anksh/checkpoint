@@ -1,126 +1,121 @@
 #!/usr/bin/python
 
-import os, getopt, subprocess, sys
-from StringIO import StringIO
+import os
+import getopt
+import subprocess
+import sys
+import pickle
 
-DATAFILE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/.checkpoints.txt"
+DATAFILE_PATH = os.path.dirname(
+    os.path.abspath(__file__)) + "/.checkpoints.txt"
+
+"""
+Structure of checkpoints dictionary:
+{
+    count: "filepath",
+}
+"""
+
 
 def _get_current_directory():
     return os.getcwd()
 
+
 def add_checkpoint():
-    # update count and write new checkpoint to back of file
-    # return number of checkpoint and the directory that was added
+    """
+    update count and write new checkpoint to back of file
+    return number of checkpoint and the directory that was added
+    """
     cwd = _get_current_directory()
-    data_file = open(DATAFILE_PATH, 'r')
-    data_buf = StringIO(data_file.read())
-    data_file.close()
 
-    num_entries = int(data_buf.readline())
-    new_entries = num_entries + 1
-    new_entries = str(new_entries)
-    data_buf.seek(0)
-    data_buf.write(new_entries.zfill(10) + '\n')
+    checkpoints = load_checkpoints()
 
-    to_write = str(new_entries)+ ' ' + cwd + '\n'
-    data_buf.seek(0, os.SEEK_END)
-    data_buf.write(to_write)
+    checkpoint_id = len(checkpoints)
 
-    data_file = open(DATAFILE_PATH, 'w')
-    data_file.write(data_buf.getvalue())
-    data_file.close()
-    data_buf.close()
+    checkpoints[checkpoint_id] = cwd
 
-    print "Added a new checkpoint number " + str(new_entries) + " at " + cwd
+    save_checkpoints(checkpoints)
+
+    print "Added new checkpoint:\n\t{}:\t{}".format(checkpoint_id, cwd)
+
 
 def go_to_checkpoint(target):
-    # find the checkpoint
-    # cd to that checkpoint
+    """
+    find the checkpoint
+    cd to that checkpoint
+    """
 
-    target = int(target)
+    checkpoint_id = int(target)
 
-    data_file = open(DATAFILE_PATH, 'r')
-    num_entries = int(data_file.readline())
-    if target > num_entries:
-        print "Invalid checkpoint number, try listing all the checkpoints as a double check!"
+    checkpoints = load_checkpoints()
+
+    if checkpoint_id not in checkpoints:
+        print "Invalid checkpoint number. Try listing all the checkpoints to double check!"
         return
 
-    for x in xrange(1, target):
-        data_file.readline()
-
-    target_line = data_file.readline()
-    target_dir = target_line.split(' ', 1)[1]
-    target_dir = target_dir[:-1] # removing newline character
+    target_dir = checkpoints[checkpoint_id]
     subprocess.call(['cd', target_dir])
 
-    data_file.close()
+    save_checkpoints(checkpoints)
     print target_dir
-    # print "Switched to checkpoint number " + str(target) + " at " + target_dir
+
 
 def delete_checkpoint(victim):
-    # read file
-    # find checkpoint
-    # remove it
-    # rewrite file
+    """
+    read file
+    find checkpoint
+    remove it
+    rewrite file
+    """
 
-    victim = int(victim)
+    checkpoint_id = int(victim)
 
-    data_file = open(DATAFILE_PATH, 'r')
-    num_entries = int(data_file.readline())
-    new_entries = str(num_entries - 1)
+    checkpoints = load_checkpoints()
 
-    if victim > num_entries:
-        print "Invalid checkpoint number, try listing all the checkpoints as a double check!"
+    if checkpoint_id in checkpoints:
+        loc = checkpoints[Checkpoint]  # only for printing
+        del checkpoints[checkpoint_id]
+        print "Removed checkpoint:\n\t{}:\t{}".format(checkpoint_id, loc)
         return
 
-    file_buf = StringIO()
-    file_buf.write(new_entries.zfill(10) + '\n')
+    print "Invalid checkpoint number. Try listing all the checkpoints to double check!"
 
-    victim_dir = None
-    for line in data_file.readlines():
-        split_line = line.split(' ', 1)
-        index = int(split_line[0])
-        if victim_dir:
-            index -= 1
-            file_buf.write(str(index) + ' ' + split_line[1])
-        else:
-            if index == victim:
-                victim_dir = split_line[1]
-            else:
-                file_buf.write(line)
-
-    data_file.close()
-    data_file = open(DATAFILE_PATH, 'w')
-    data_file.write(file_buf.getvalue())
-    data_file.close()
-    file_buf.close()
-
-    print "Removed checkpoint number " +  str(victim)  + " at " + victim_dir[:-1]
 
 def erase_all_checkpoints():
     # as simple as clearing the file
 
-    data_file = open(DATAFILE_PATH, 'w')
-    data_file.write('0')
-    data_file.close()
+    checkpoints = load_checkpoints()
+    checkpoints.clear()
+    save_checkpoints(checkpoints)    
 
     print "Cleared all checkpoints"
+
 
 def list_checkpoints():
     # print out all checkpoints in a readable manner
 
-    data_file = open(DATAFILE_PATH, 'r')
+    checkpoints = load_checkpoints()
 
-    num_entries = int(data_file.readline())
+    print "Listing all checkpoints:"
+    for checkpoint_id, path in checkpoints:
+        print "{}:\t{}".format(checkpoint_id, path)
+    
 
-    print "Listing " + str(num_entries) + " checkpoints..."
 
-    for line in data_file.readlines():
-        split_line = line.split(' ', 1)
-        print "Checkpoint #" + split_line[0] + ":\t" + split_line[1] ,
+def load_checkpoints():
+    """
+    Loads the checkpoints dictionary from the pickled file or creates a new one if it doesnt exist.
+    """
+    checkpoints = pickle.load(DATAFILE_PATH)
 
-    data_file.close()
+    if not checkpoints:
+        checkpoints = dict()
 
+    return checkpoints
+
+
+def save_checkpoints(checkpoints):
+    pickle.dump(checkpoints, DATAFILE_PATH)
 
 
 def main():
@@ -158,11 +153,13 @@ def main():
             go_to_checkpoint(a)
 
         elif o == "-r":
-            # r <int>: removes a specific checkpoint - should prompt the user before doing so
+            # r <int>: removes a specific checkpoint - should prompt the user
+            # before doing so
             delete_checkpoint(a)
 
         elif o == "-e":
-            # e: erases all checkpoints - should prompt the user before doing so
+            # e: erases all checkpoints - should prompt the user before doing
+            # so
             erase_all_checkpoints()
 
         elif o == "-l":
