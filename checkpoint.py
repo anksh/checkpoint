@@ -27,11 +27,9 @@ def add_checkpoint():
     return number of checkpoint and the directory that was added
     """
     cwd = _get_current_directory()
-
     checkpoints = load_checkpoints()
 
     checkpoint_id = len(checkpoints)
-
     checkpoints[checkpoint_id] = cwd
 
     save_checkpoints(checkpoints)
@@ -73,7 +71,7 @@ def delete_checkpoint(victim):
     checkpoints = load_checkpoints()
 
     if checkpoint_id in checkpoints:
-        loc = checkpoints[Checkpoint]  # only for printing
+        loc = checkpoints[checkpoint_id]  # only for printing
         del checkpoints[checkpoint_id]
         print "Removed checkpoint:\n\t{}:\t{}".format(checkpoint_id, loc)
         return
@@ -84,8 +82,7 @@ def delete_checkpoint(victim):
 def erase_all_checkpoints():
     # as simple as clearing the file
 
-    checkpoints = load_checkpoints()
-    checkpoints.clear()
+    checkpoints = dict()
     save_checkpoints(checkpoints)    
 
     print "Cleared all checkpoints"
@@ -106,15 +103,21 @@ def load_checkpoints():
     """
     Loads the checkpoints dictionary from the pickled file or creates a new one if it doesnt exist.
     """
-    checkpoints = pickle.load(DATAFILE_PATH)
-
-    if not checkpoints:
+    try:
+        checkpoints = pickle.load(DATAFILE_PATH)
+    except Exception, e:
         checkpoints = dict()
+    else:
+        if not checkpoints:
+            checkpoints = dict()
 
     return checkpoints
 
 
 def save_checkpoints(checkpoints):
+    """
+    Dumps the checkpoints dict to the file
+    """
     pickle.dump(checkpoints, DATAFILE_PATH)
 
 
