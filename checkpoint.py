@@ -94,7 +94,7 @@ def list_checkpoints():
     checkpoints = load_checkpoints()
 
     print "Listing all checkpoints:"
-    for checkpoint_id, path in checkpoints:
+    for checkpoint_id, path in checkpoints.items():
         print "{}:\t{}".format(checkpoint_id, path)
     
 
@@ -104,7 +104,8 @@ def load_checkpoints():
     Loads the checkpoints dictionary from the pickled file or creates a new one if it doesnt exist.
     """
     try:
-        checkpoints = pickle.load(DATAFILE_PATH)
+        with open(DATAFILE_PATH, "rb") as f:
+            checkpoints = pickle.load(DATAFILE_PATH)
     except Exception, e:
         checkpoints = dict()
     else:
@@ -118,7 +119,8 @@ def save_checkpoints(checkpoints):
     """
     Dumps the checkpoints dict to the file
     """
-    pickle.dump(checkpoints, DATAFILE_PATH)
+    with open(DATAFILE_PATH, "wb") as f:
+        pickle.dump(checkpoints, f)
 
 
 def main():
