@@ -7,7 +7,7 @@ import sys
 import pickle
 
 DATAFILE_PATH = os.path.dirname(
-    os.path.abspath(__file__)) + "/.checkpoints.txt"
+    os.path.abspath(__file__)) + "/.checkpoints.pickle"
 
 """
 Structure of checkpoints dictionary:
@@ -44,7 +44,6 @@ def go_to_checkpoint(target):
     """
 
     checkpoint_id = int(target)
-
     checkpoints = load_checkpoints()
 
     if checkpoint_id not in checkpoints:
@@ -52,7 +51,7 @@ def go_to_checkpoint(target):
         return
 
     target_dir = checkpoints[checkpoint_id]
-    subprocess.call(['cd', target_dir])
+    os.chdir(target_dir)  # TODO: fix this
 
     save_checkpoints(checkpoints)
     print target_dir
@@ -105,7 +104,7 @@ def load_checkpoints():
     """
     try:
         with open(DATAFILE_PATH, "rb") as f:
-            checkpoints = pickle.load(DATAFILE_PATH)
+            checkpoints = pickle.load(f)
     except Exception, e:
         checkpoints = dict()
     else:
